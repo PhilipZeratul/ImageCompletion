@@ -33,18 +33,9 @@ def ComputeTreeNodes(tree):
 
 
 # Construct WHT compute tree
-def WHTTree(patch, numOfBase):
-    # Check if input is valid
-    m = np.log2(patch.shape[0])
-    if not m.is_integer:
-        print("Error: WHTTree input shape is not power of 2!")
-        return
-    if not m == np.log2(patch.shape[1]):
-        print("Error: WHTTree input is not square matrix!")
-        return
-
-    h = 2 * m  # Levels of binary tree
-    length = int(2**h - 1) + numOfBase  # Total length of full binary tree
+def WHTTree(patch, patchSize, numOfBase):
+    h = 2 * np.log2(patchSize)  # Levels of binary tree
+    length = int(2 ** h - 1) + numOfBase  # Total length of full binary tree
     tree = np.empty(length, dtype=object)
     tree[0] = patch
 
@@ -57,18 +48,13 @@ def main():
     p = 2 ** m  # window(patch) size
     numOfBase = 16
 
-    IMAGE_WIDTH = 80
-    IMAGE_HEIGHT = 60
+    IMAGE_WIDTH = 800
+    IMAGE_HEIGHT = 600
     sourceImage = np.random.randint(255, size=(IMAGE_HEIGHT, IMAGE_WIDTH))
 
     startTime = int(round(time.time() * 1000))
     #
-    for i in xrange(0, IMAGE_HEIGHT - p):
-        for j in xrange(0, IMAGE_WIDTH - p):
-            patch = sourceImage[i:i + p, j:j + p]
-            # Can be simplified to better performance
-            tree = WHTTree(patch, numOfBase)
-            np.vstack(tree[-numOfBase:]).flatten()
+    WHTTree(sourceImage, p, numOfBase)
     #
     endTime = int(round(time.time() * 1000))
     elapse = endTime - startTime
