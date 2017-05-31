@@ -3,6 +3,7 @@ import math
 import time
 
 
+# TODO: can optimize to just compute required nodes by the numOfNodes (back propagation)
 def ComputeTreeNodes(tree):
     n = len(tree)  # num of nodes (1, 2, 3, ...)
     h = int(math.ceil(np.log2(n + 1)))  # total layers (1, 2, 3, ...)
@@ -14,19 +15,17 @@ def ComputeTreeNodes(tree):
         for node in xrange(2 ** layer - 1, min(n, 2 ** (layer + 1) - 1)):
             parent = int(math.floor((node - 1) / 2))
 
+            pHeight, pWidth = tree[parent].shape
             # compute row |
-            if layer % 2 == 0:
-                p = tree[parent].shape[1]
-                tree[node] = np.zeros((p, p), dtype=int)
-                for i in xrange(0, p):
+            if layer % 2 == 0:                
+                tree[node] = np.zeros((pHeight - delta, pWidth), dtype=int)
+                for i in xrange(0, pHeight - delta):
                     tree[node][i, :] = tree[parent][i, :] + tree[parent][i + delta, :] * seed[seedPointer]
 
             # compute col ->
             else:
-                p = tree[parent].shape[0]
-                tree[node] = np.zeros((p, p - delta), dtype=int)
-
-                for i in xrange(0, p - delta):
+                tree[node] = np.zeros((pHeight, pWidth - delta), dtype=int)
+                for i in xrange(0, pWidth - delta):
                     tree[node][:, i] = tree[parent][:, i] + tree[parent][:, i + delta] * seed[seedPointer]
 
             seedPointer = (seedPointer + 1) % 8
